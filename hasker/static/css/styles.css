@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css?family=Gloria+Hallelujah');
+
+.navbar-brand {
+    font-family: 'Gloria Hallelujah', cursive;
+    font-size: 1.5rem;
+}
+.navbar-shadow {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+}
+.user-avatar-min {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+}
+
+.avatar-img-100 {
+    width:100%;
+    max-width: 100px;
+}
+
+.avatar-img-150 {
+    width:100%;
+    max-width: 150px;
+}
+
+.avatar-img-250 {
+    width:100%;
+    max-width: 250px;
+}

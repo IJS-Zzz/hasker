@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+
+    <meta name="viewport" content="{% block viewport %}width=device-width, initial-scale=1{% endblock %}">
+    <meta name="description" content="{% block description %}{% endblock %}">
+
+    {% block favicon %}{% endblock %}
+
+    <!-- CSS Styles -->
+    {# Block where global CSS will go. #}
+    {% block styles %}{% endblock %}
+
+    {# Additional CSS - specific to certain pages #}
+    {% block extrastyles %}{% endblock %}
+    <!-- /CSS Styles -->
+
+    <!-- Extra Head -->
+    {% block extrahead %}{% endblock %}
+    <!-- /Extra Head -->
+</head>
+<body id="{% block body_id %}{% endblock %}"
+      class="{% block body_class %}{% endblock %}">
+    {# Main content goes in this 'layout' block #}
+    {% block layout %}{% endblock %}
+
+    <!-- JS Scripts -->
+    {# Scripts loaded from a CDN. #}
+    {% block cdn_scripts %}{% endblock %}
+
+    {# Local scripts #}
+    {% block scripts %}{% endblock %}
+
+    {# Additional JS scripts #}
+    {% block extrascripts %}{% endblock %}
+
+    {# Block for body onload functions #}
+    <script>
+        $(function() {
+            {% block onbodyload %}{% endblock %}
+        });
+    </script>
+    <!-- /JS Scripts -->
+</body>
+</html>

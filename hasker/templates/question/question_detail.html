@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+{% load form_tags %}
+
+{% block title%}{% if question.title %}{{question.title}}{% else %}Question{% endif %}{% endblock %}
+
+{% block main %}
+
+    <!-- <h2>{{question.title}}</h2> -->
+
+    <!-- Question - Question -->
+    <div class="question-main-ask">
+      <div class="row">
+        <!-- logo block -->
+        <div class="col-sm-2 mb-3">
+          <div class="row">
+            <!-- Avatar -->
+            <div class="col-6 col-sm-12">
+              <img data-src="holder.js/100x100" class="rounded mx-auto d-block avatar-img-150" alt="Avatar" data-holder-rendered="true" src="{{question.author.get_avatar_url}}">
+            </div>
+            <!-- Votes -->
+            <div class="col-6 col-sm-12 text-center my-4">
+              <a href="{{ question.get_vote_url }}" class="vote-up vote" title="Up vote">
+                <i class="fas fa-chevron-up"></i></a><br>
+              <b class="rating">{{ question.rating }}</b><br>
+              <a href="{{ question.get_vote_url }}" class="vote-down vote" title="Down vote">
+                <i class="fas fa-chevron-down"></i></a><br>
+            </div>
+          </div>
+          <!-- /.row -->
+        </div>
+        <!-- Question -->
+        <div class="col-sm-10">
+            <h5><a href="{{ question.author.url }}">{{ question.author|title }}</a></h5>
+            <h4>{{ question.title }}</h4>
+            <p>{{ question.text }}</p>
+            {% with question.tags.all as tags %}
+                {% if tags %}
+                    <p>Tags: {% for tag in tags %}<a href="{{ tag.url }}">{{tag}}</a> {% endfor %}</p>
+                {% endif %}
+            {% endwith %}
+        </div>
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.question-main-ask -->
+
+    {% if answers %}
+        <hr>
+        <!-- Question - Answers -->
+        <div class="answer-list">
+        {% for answer in answers %}
+            {% include 'question/partials/answer.html' %}
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if is_paginated %}
+        <!-- Question - Pagination -->
+        {% include 'partials/pagination.html' %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <hr>
+        <!-- Question - Add Answer -->
+        {% include 'partials/form.html' %}
+    {% endif %}
+{% endblock %}

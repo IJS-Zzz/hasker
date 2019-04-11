@@ -1,0 +1,26 @@
+<form {% if form_id %}id="{{ form_id }}"{% endif %}
+    {% if class %}class="{{ class }}"{% endif %}
+    method="{{ method|default:'post' }}"
+    {% if action %}action="{{ action }}"{% endif %}
+    {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+
+    {% if not method == "get" %}{% csrf_token %}{% endif %}
+
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% for field in form %}
+        {% include 'partials/form_field.html'%}
+    {% endfor %}
+
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit" data-loading-text="'Saving...'">
+            Submit
+        </button>
+    </div>
+</form>

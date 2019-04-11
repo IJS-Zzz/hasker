@@ -1,0 +1,58 @@
+{% load static %}
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light navbar-shadow">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            Hasker
+        </a>
+
+        <button aria-controls="NavBar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#NavBar" data-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="NavBar">
+
+            <!-- Search -->
+            <form class="form-inline ml-auto my-1 mr-3" method="get" action="{% url 'question:search' %}">
+                <div class="input-group">
+                    <input class="form-control" type="text" name="q" placeholder="Search" aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-dark" type="submit"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Ask a Question -->
+            {% if user.is_authenticated %}
+                <div class="my-3 my-lg-0 d-lg-none">
+                    <a class="btn btn-light" href="{% url 'question:ask' %}">Ask</a>
+                </div>
+            {% endif %}
+
+            <!-- User Panel -->
+            <ul class="navbar-nav my-1 ml-3">
+                <li class="nav-item">
+                    {% if user.is_authenticated %}
+                        <img src="{{ user.get_avatar_url }}" class="user-avatar-min" alt="avatar">
+                        <a class="btn mr-2 btn-light" href="{{ user.url }}">
+                            {{user.username|title}}
+                        </a>
+                        <a class="btn mr-2 btn-light" href="{% url 'account:logout' %}">
+                            Log Out
+                        </a>
+                    {% else %}
+                        <a class="btn mr-2 btn-light" href="{% url 'account:login'%}?next={{request.get_full_path}}">
+                            Log In
+                        </a>
+                        <a class="btn mr-2 btn-light" href="{% url 'account:singup' %}">
+                            Sing Up
+                        </a>
+                    {% endif %}
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+<!-- /.navbar -->

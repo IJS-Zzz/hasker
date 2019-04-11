@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title%}{% if title %}{{title}}{% else %}Ask{% endif %}{% endblock %}
+
+{% block extrastyles %}
+    <link rel="stylesheet" href="{% static 'css/tagify.css' %}">
+{% endblock %}
+
+{% block main %}
+    <h2>{{title}}</h2>
+    <br>
+    {% include 'partials/form.html' %}
+{% endblock %}
+
+{% block extrascripts %}
+    <script src="{% static 'js/jQuery.tagify.min.js' %}"></script>
+{% endblock %}
+
+{% block onbodyload %}
+    $('[name=tags]').tagify({
+        delimiters: ",",
+        duplicates: false,
+        maxTags: {{ max_tags_limit }},
+    });
+    $('form').submit( function() {
+        let tags = $('#id_tags')[0].value;
+        tags = JSON.parse(tags);
+
+        let clear_tags = [];
+
+        for (let i = 0; i < tags.length; i++) {
+            clear_tags.push(tags[i].value);
+        }
+        $('#id_tags')[0].value = clear_tags.join(', ');
+        return true;
+    });
+{% endblock %}

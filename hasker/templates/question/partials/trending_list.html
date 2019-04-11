@@ -1,0 +1,13 @@
+{% if questions %}
+    <h4>Trending</h4>
+    <ol class="list-unstyled">
+        {% for question in questions %}
+            <li class="my-2">
+                <span class="btn btn-sm mr-1 {% if question.has_answer %}btn-success{% else %}btn-secondary{% endif %}">{{question.rating}}</span>
+                <a href="{{question.url}}">{{ question.title|truncatechars:30|title }}</a>
+            </li>
+        {% endfor %}
+    </ol>
+{% endif %}
+
+

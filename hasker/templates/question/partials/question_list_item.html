@@ -1,0 +1,35 @@
+{% load question_tags %}
+
+<div class="row m-2">
+    <div class="col-9">
+        <div class="row">
+            <div class="col-3 order-2 order-sm-1 align-self-center">
+                <p class="text-center">{{ question.rating }}</p>
+                <p class="text-center">Votes</p>
+            </div>
+            <div class="col-3 order-3 order-sm-2 align-self-center">
+                <p class="text-center">{{ question.answer_set.count }}</p>
+                <p class="text-center">Answers</p>
+            </div>
+            <div class="col-12 col-sm-6 order-1 order-sm-3 mb-3 mb-sm-1">
+                <a href="{{question.url}}">
+                    <h5>{{ question.title|truncatechars:100|title }}</h5>
+                </a>
+                <div class="mt-3">
+                    {% with question.tags.all as tags %}
+                        {% if tags %}
+                            <p>Tags: {% for tag in tags %}<a href="{{ tag.url }}">{{tag}}</a> {% endfor %}</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <div class="col-3 align-self-center">
+        <a href="{{ question.author.url }}"
+            ><p class="text-center">{{ question.author|title }}</p></a>
+        <p class="text-center">asked {{ question.pub_date | get_human_date }}</p>
+    </div>
+</div>
+<!-- /.row -->

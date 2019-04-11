@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block main %}
+<h2>
+    Profile
+</h2>
+
+<div class="row my-4">
+    <!-- Profile Avatar -->
+    <div class="col-sm-3">
+        <div class="my-3">
+            <img src="{{ profile.get_avatar_url }}" class="rounded mx-auto d-block avatar-img-250" alt="Avatar">
+        </div>
+        {% if profile.pk is user.pk %}
+            <div class="my-3">
+                <div class="p-3">
+                    <a class="btn btn-outline-dark btn-block" href="{% url 'account:edit' %}">Edit Profile</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Profile Info -->
+    <div class="col-sm-9">
+        <div class="m-3">
+            <h4>{{ profile.username|title }}</h4>
+            <p>{{ profile.email }}</p>
+            <hr>
+            <div class="row my-3 text-center">
+                <div class="col-4">
+                    <p>Total Questions</p>
+                    <p>{{ profile.question_set.count }}</p>
+                </div>
+                <div class="col-4">
+                    <p>Total Answers</p>
+                    <p>{{ profile.answer_set.count }}</p>
+                </div>
+                <div class="col-4">
+                </div>
+            </div>
+            <hr>
+        </div>
+    </div>
+</div>
+{% endblock %}

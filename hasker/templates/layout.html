@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hasker{% endblock %}
+{% block description %}Hasker: Poor Man's Stackoverflow{% endblock %}
+{% block favicon %}
+  <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+{% endblock %}
+
+
+{% block styles %}
+  <!-- Twitter Bootstrap 4 -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+
+  <!-- Fontawesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+
+{% block layout %}
+  {% include 'partials/navbar.html' %}
+
+  <!-- WRAPPER -->
+  {% block content_wrapper %}
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Main -->
+      <main class="col-lg-9 my-2">
+        {% block main %}
+        {% endblock %}
+      </main>
+      <!-- /Main -->
+
+      <!-- Sidebar -->
+      <aside class="col-lg-3 my-3">
+        {% block sitebar %}
+          {% include 'partials/sidebar.html' %}
+        {% endblock %}
+      </aside>
+      <!-- /Sidebar -->
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /.container -->
+  {% endblock %}
+{% endblock %}
+
+
+{% block cdn_scripts %}
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+  <!-- Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+  <!-- Twitter Bootstrap 4 js -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{% static 'js/question_vote.js' %}"></script>
+{% endblock %}

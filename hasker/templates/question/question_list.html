@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title%}{% if title %}{{title}}{% else %}Questions{% endif %}{% endblock %}
+
+{% block main %}
+    <h2>{{title}}</h2>
+    <p>
+        <a href="{% url 'question:index' %}">New Questions</a> <span class="mx-2">|</span>
+        <a href="{% url 'question:index' %}?sort=popular">Hot Questions</a>
+    </p>
+    <hr>
+    {% if questions %}
+        {% for question in questions %}
+            {% include 'question/partials/question_list_item.html' %}
+            <hr>
+        {% endfor %}
+        {% include 'partials/pagination.html' with page_url=paginate_url %}
+    {% else %}
+        <p>No Questions</p>
+    {% endif %}
+{% endblock %}
