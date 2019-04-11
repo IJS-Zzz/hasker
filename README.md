@@ -18,7 +18,7 @@ email: smurov_igor@mail.ru
 
 ### Run Docker container
 ```
-docker run --rm -it -p 8080:80 -v /Users/smurov/Desktop/OTUS_Python/hasker/hasker:/home/box ubuntu /bin/bash
+docker run --rm -it -p 8080:80 ubuntu /bin/bash
 ```
 
 ### Prepare
