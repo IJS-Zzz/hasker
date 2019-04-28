@@ -12,7 +12,6 @@ urlpatterns = [
     path('', include('hasker.question.urls')),
     path('api/v1/', include('hasker.api.urls')),
     path('admin/', admin.site.urls),
-    path('docs/', include_docs_urls(title='My API title'), name='api-docs'),
 ]
 
 if settings.DEBUG:
