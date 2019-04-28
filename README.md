@@ -30,8 +30,43 @@ apt-get install -y git \
 git clone https://github.com/IJS-Zzz/hasker.git
 ```
 
-### Build
+### Build (deploy)
 ```
 cd hasker
 make prod
+```
+---
+
+### Configuration options
+The project has config files for different run cases:
+
+#### Development server
+use dev.py config file (path: hasker/config/settings/dev.py) <br>
+with dev.txt requirements (path: requirements/dev.txt)
+
+###### run example
+```
+pip install -U -r requirements/dev.txt 
+export DJANGO_SETTINGS_MODULE=hasker.config.settings.dev
+python manage.py runserver
+```
+
+#### Production server
+(used in deploy)
+use prod.py config file (path: hasker/config/settings/prod.py) <br>
+with prod.txt requirements (path: requirements/prod.txt)
+
+note: you should run postgresql server with before run project
+
+###### run example
+```
+pip install -U -r requirements/prod.txt 
+export DJANGO_SETTINGS_MODULE=hasker.config.settings.prod
+python manage.py runserver
+```
+
+### Testing
+Run project tests:
+```
+python manage.py test
 ```

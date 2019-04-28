@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import UploadedFile
 from django.db.models import FileField
 from django.forms import forms
 from django.template.defaultfilters import filesizeformat
@@ -18,29 +19,34 @@ class AvatarImageField(FileField):
     def __init__(self, *args, **kwargs):
         self.content_types = kwargs.pop('content_types') if 'content_types' in kwargs else []
         self.max_upload_size = kwargs.pop('max_upload_size') if 'max_upload_size' in kwargs else 0
+        self._old_file = None
         super().__init__(*args, **kwargs)
 
     def save_form_data(self, instance, data):
         if data is not None:
-            _file = getattr(instance, self.attname)
-            if _file != data:
-                _file.delete(save=False)
+            file = getattr(instance, self.attname)
+            if file != data:
+                self._old_file = file
         super().save_form_data(instance, data)
+
+    def pre_save(self, model_instance, add):
+        file = super().pre_save(model_instance, add)
+        if self._old_file and self._old_file != file:
+            self._old_file.delete(save=False)
+        return file
 
     def clean(self, *args, **kwargs):
         data = super().clean(*args, **kwargs)
-        _file = data.file
+        file = data.file
 
-        try:
-            content_type = _file.content_type
+        if isinstance(file, UploadedFile):
+            content_type = file.content_type
             if content_type in self.content_types:
-                if _file._size > self.max_upload_size:
+                if file.size > self.max_upload_size:
                     raise forms.ValidationError(_('Please keep filesize under {}. Current filesize {}').format(
-                        filesizeformat(self.max_upload_size), filesizeformat(_file._size))
+                        filesizeformat(self.max_upload_size), filesizeformat(file.size))
                     )
             else:
                 raise forms.ValidationError(_('Filetype not supported'))
-        except AttributeError:
-            pass
 
         return data

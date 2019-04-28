@@ -83,12 +83,12 @@ class IndexView(generic.ListView):
     paginate_by = settings.PAGINATE_QUESTIONS
     template_name = 'question/question_list.html'
 
+
     def get_queryset(self):
         sort = self.request.GET.get('sort')
         if sort == 'popular':
             return Question.objects.popular()
-        else:
-            return Question.objects.new()
+        return Question.objects.new()
 
     def get_context_data(self):
         title = 'New Questions'
@@ -138,8 +138,7 @@ class AnswerMarkView(View):
             answer = get_object_or_404(self.model, pk=pk)
             success = answer.mark(request.user)
             return JsonResponse({'success': success})
-        else:
-            return HttpResponseForbidden()
+        return HttpResponseForbidden()
 
 
 class BaseVoteView(View):
@@ -155,8 +154,7 @@ class BaseVoteView(View):
             instance = get_object_or_404(model, pk=pk)
             instance.vote(request.user, value)
             return JsonResponse({'rating': instance.rating})
-        else:
-            return HttpResponseForbidden()
+        return HttpResponseForbidden()
 
 
 class QuestionVoteView(BaseVoteView):

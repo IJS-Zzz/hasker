@@ -1,0 +1,573 @@
+swagger: "2.0"
+info:
+  title: Hasker API
+  description: |
+    Hacker API implementation description
+  version: "0.1.0"
+schemes:
+- http
+basePath: /api/v1
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /api-token-auth:
+    post:
+      summary: Get API Token
+      description: |
+        Получение API токена для пользователя по его логину и паролью
+      operationId: apiTokenAuth
+      parameters:
+      - in: body
+        name: body
+        required: true
+        description: Логин и пароль пользователя.
+        schema:
+          $ref: '#/definitions/ApiTokenAuth'
+      responses:
+        200:
+          description: Токен для пользователя отправлен
+          schema:
+            $ref: '#/definitions/Token'
+        400:
+          description: не корректный запрос или логин/пароль
+  /:
+    get:
+      summary: Корень API
+      description: Список основых ресурсов API
+      operationId: api-root
+      responses:
+        200:
+          description: Доступные ресурсы API
+          schema:
+            $ref: '#/definitions/ApiRoot'
+        401:
+          description: Необходима авторизация
+  /questions:
+    get:
+      summary: Список вопросов
+      description: |
+        Список вопросов упорядоченых по дате создания.
+        По 20 вопросов на страницу.
+      operationId: questions-list
+      parameters:
+      - in: query
+        name: page
+        type: integer
+        minimum: 1
+        description: Номер запрашиваемой страницы
+      - in: query
+        name: sort
+        type: string
+        enum: [new, popular]
+        description: |
+          Тип сортировки:
+          * new - Список вопросов упорядоченых по дате создания
+          * popular - Список вопросов упорядоченых рейтингу
+      responses:
+        200:
+          description: Упорядоченный список вопросов
+          schema:
+            $ref: '#/definitions/QuestionsList'
+        401:
+          description: Необходима авторизация
+        404:
+          description: Не верно указан номер страницы для пагинации.
+  /questions/{pk}:
+    get:
+      summary: Вопрос
+      description: |
+        Подробная Информация о вопросе
+      operationId: questionDetail
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор вопроса.
+      responses:
+        200:
+          description: Информация о вопросе.
+          schema:
+            $ref: '#/definitions/Question'
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий вопрос.
+    delete:
+      summary: Удаление вопроса
+      description: |
+        Удаление вопроса.
+        Доступно только для автора вопроса
+      operationId: questionDelete
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор вопроса.
+      responses:
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий вопрос.
+  /questions/{pk}/answers:
+    get:
+      summary: список ответов на вопрос
+      description: |
+        Списов ответов на вопрос.
+        Ответы упорядочены по рейтингу и дате создания.
+        По 20 ответов на страницу.
+      operationId: questionAnswersList
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: primary key вопроса
+      - in: query
+        name: page
+        type: integer
+        minimum: 1
+        description: Номер запрашиваемой страницы
+      responses:
+        200:
+          description: Список ответов на вопрос
+          schema:
+            $ref: '#/definitions/AnswersList'
+        401:
+          description: Необходима авторизация
+        404:
+          description: Не верно указан номер страницы для пагинации.
+  /questions/{pk}/vote/:
+    post:
+      summary: Проголосовать за вопрос
+      description: |
+        Голосование за вопрос.
+        Пользователь может проголосовать один раз за вопрос
+        повысив или понизив рейтинг вопроса и может отменить 
+        свой голос и переголосовать заново.
+        Пользователь не может головаовать за свой вопрос.
+      operationId: questionVote
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор вопроса.
+      - in: body
+        name: value
+        required: true
+        description: Отданный голос.
+        schema:
+          $ref: '#/definitions/VotePost'
+      responses:
+        201:
+          description: |
+            Информация о новом рейтинге вопроса
+          schema:
+            $ref: '#/definitions/VoteResponses'
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий вопрос.
+  /answers/{pk}:
+    get:
+      summary: Ответ на вопрос
+      description: |
+        Подробная информация о ответе на вопрос
+      operationId: answerDetail
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор ответа на вопрос.
+      responses:
+        200:
+          description: Информация о ответе на вопрос.
+          schema:
+            $ref: '#/definitions/Answer'
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий ответ на вопрос.
+    delete:
+      summary: Удаление ответа
+      description: |
+        Удаление ответа на вопрос.
+        Доступно только для автора вопроса
+      operationId: answerDelete
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор ответа на вопрос.
+      responses:
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий ответ на вопрос.
+  /answers/{pk}/vote:
+    post:
+      summary: Проголосовать за ответ на вопрос.
+      description: |
+        Голосование за ответ на вопрос.
+        Пользователь может проголосовать один раз за ответ
+        повысив или понизив рейтинг ответа и может отменить
+        свой голос и переголосовать заново.
+        Пользователь не может головаовать за свой ответ.
+      operationId: answerVote
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор ответа на вопроса.
+      - in: body
+        name: value
+        required: true
+        description: Отданный голос.
+        schema:
+          $ref: '#/definitions/VotePost'
+      responses:
+        201:
+          description: |
+            Информация о новом рейтинге ответа
+          schema:
+            $ref: '#/definitions/VoteResponses'
+        401:
+          description: Необходима авторизация.
+        404:
+          description: Не существующий ответ на вопрос.
+  /tags:
+    get:
+      summary: Список Тегов
+      description: |
+        Список всех существующих тегов
+        По 20 тегов на страницу.
+      operationId: tagsList
+      parameters:
+      - in: query
+        name: page
+        type: integer
+        minimum: 1
+        description: Номер запрашиваемой страницы
+      responses:
+        200:
+          description: Список Тегов
+          schema:
+            $ref: '#/definitions/TagsList'
+        401:
+          description: Необходима авторизация
+        404:
+          description: Не верно указан номер страницы для пагинации.
+  /tags/{pk}/questions:
+    get:
+      summary: список вопросов с тегом
+      description: |
+          Список вопросов с тегом упорядоченых по дате создания.
+          По 20 вопросов на страницу.
+      operationId: tagQuestionsList
+      parameters:
+      - in: path
+        name: pk
+        required: true
+        type: integer
+        minimum: 1
+        description: Идентификатор тега
+      - in: query
+        name: page
+        type: integer
+        minimum: 1
+        description: Номер запрашиваемой страницы
+      responses:
+        200:
+          description: Список вопросов
+          schema:
+            $ref: '#/definitions/QuestionsList'
+        401:
+          description: Необходима авторизация
+        404:
+          description: Не верно указан номер страницы для пагинации.
+  /search:
+    get:
+      summary: Поиск вопросов
+      description: |
+        Получение списка вопросов по заданной поисковой строке.
+        Вопросы упорядочены по дате создания.
+        По 20 вопросов на страницу.
+      operationId: search
+      parameters:
+      - in: query
+        name: q
+        description: |
+          Строка запроса.
+          Для поиска по тегам запрос должен начинаться с префикса "tag:"
+        required: true
+        type: string
+      - in: query
+        name: page
+        type: integer
+        minimum: 1
+        description: Номер запрашиваемой страницы
+      responses:
+        200:
+          description: Упорядоченный список вопросов
+          schema:
+            $ref: '#/definitions/QuestionsList'
+        401:
+          description: Необходима авторизация
+        404:
+          description: Не верно указан номер страницы для пагинации.
+  /trending:
+    get:
+      summary: Список популярных вопросов
+      description: |
+        Список 20 наиболее популярных вопросов
+        Вопросы упорядочены по рейтингу и дате создания.
+      operationId: trendingQuestions
+      responses:
+        200:
+          description: список вопросов
+          schema:
+            $ref: '#/definitions/TrendingQuestions'
+        401:
+          description: Необходима авторизация
+definitions:
+  ApiTokenAuth:
+    required: [username, password]
+    properties:
+      username:
+        type: string
+        minLength: 1
+      password:
+        type: string
+        minLength: 8
+  Token:
+    description: |
+      Авторизационный токен.
+      Используется для доступа к ресурсам API.
+      Добавляется в заголовок HTTP запроса:
+        Authorization: Token {token}
+    type: object
+    properties:
+      token:
+        type: string
+        format: text
+        description: Токен
+        example: cad65491336c995c020c81dd0507c8cd25653243
+        x-isnullable: false
+  ApiRoot:
+    description: |
+      Словарь доступных ресурсов API с сылками на них.
+    type: object
+    properties:
+      questions:
+        type: string
+        format: uri
+        description: Ссылка на ресурс со списком вопросов.
+        x-isnullable: false
+      trending:
+        type: string
+        format: uri
+        description: |
+          Ссылка на ресурс со списком наиболее популярных вопросов.
+        x-isnullable: false
+      search:
+        type: string
+        format: uri
+        description: |
+          Ссылка на ресурс поиска вопросов по названию, содержимому и тегам.
+        x-isnullable: false
+      tags:
+        type: string
+        format: uri
+        description: Ссылка на ресурс со списком тегам.
+        x-isnullable: false
+  Question:
+    description: Информация о вопросе
+    type: object
+    properties:
+      pk:
+        type: number
+        format: int64
+        description: Идентификатор вопроса.
+        readOnly: true
+        x-isnullable: false
+      title:
+        type: string
+        format: text
+        description: Заголовок вопроса.
+        example: To be, or not to be?
+        x-isnullable: false
+      text:
+        type: string
+        format: text
+        description: Текст вопроса.
+        example: How good is Python?
+        x-isnullable: false
+      author:
+        type: string
+        format: identity
+        description: Автор вопроса.
+        example: Username
+        x-isnullable: false
+      slug:
+        type: string
+        format: identity
+        description: Идентификатор вопроса (slug).
+        readOnly: true
+      rating:
+        type: number
+        format: int64
+        description: Рейтинг вопроса.
+        readOnly: true
+        x-isnullable: false
+      pub_date:
+        type: string
+        format: date-time
+        description: Дата публикации вопроса.
+        readOnly: true
+        x-isnullable: false
+      tags:
+        type: array
+        description: Список тегов вопроса
+        items:
+          type: string
+          format: identity
+      has_answer:
+        type: boolean
+        description: Истина, если на данный вопрос есть правильный ответ.
+        readOnly: true
+        x-isnullable: false
+      answers:
+        type: string
+        format: uri
+        description: Ссылка на список ответов на вопрос.
+        x-isnullable: false
+  QuestionInfo:
+    description: Краткая информация о вопросе
+    type: object
+    properties:
+      pk:
+        type: number
+        format: int64
+        description: Идентификатор вопроса.
+        readOnly: true
+        x-isnullable: false
+      title:
+        type: string
+        format: text
+        description: Заголовок вопроса.
+        example: To be, or not to be?
+        x-isnullable: false
+      url:
+        type: string
+        format: uri
+        description: Ссылка на детальную информацию о вопросе.
+        x-isnullable: false
+  QuestionsList:
+    description: Списов вопросов
+    type: array
+    items:
+      $ref: '#/definitions/QuestionInfo'
+  Answer:
+    description: Информация об ответе на вопрос
+    type: object
+    properties:
+      pk:
+        type: number
+        format: int64
+        description: Идентификатор ответа.
+        readOnly: true
+        x-isnullable: false
+      text:
+        type: string
+        format: text
+        description: Текст ответа.
+        example: I think it is possible
+        x-isnullable: false
+      author:
+        type: string
+        format: identity
+        description: Автор вопроса.
+        example: Username
+        x-isnullable: false
+      pub_date:
+        type: string
+        format: date-time
+        description: Дата публикации вопроса.
+        readOnly: true
+        x-isnullable: false
+      rating:
+        type: number
+        format: int64
+        description: Рейтинг вопроса.
+        readOnly: true
+        x-isnullable: false
+  AnswersList:
+    description: Списов ответов на вопрос
+    type: array
+    items:
+      $ref: '#/definitions/Answer'
+  TrendingQuestions:
+    description: Список популярных вопросов
+    type: array
+    items:
+      $ref: '#/definitions/QuestionInfo'
+  Tag:
+    description: Информация об ответе на вопрос
+    type: object
+    properties:
+      pk:
+        type: number
+        format: int64
+        description: Идентификатор ответа.
+        readOnly: true
+        x-isnullable: false
+      name:
+        type: string
+        format: identity
+        description: Название тега.
+        example: python
+        x-isnullable: false
+      questions:
+        type: string
+        format: uri
+        description: Ссылка на список вопрос содержащих данный тег.
+        x-isnullable: false
+  TagsList:
+    description: Списов тегов
+    type: array
+    items:
+      $ref: '#/definitions/Tag'
+  VotePost:
+    description: Отданный голос.
+    type: object
+    properties:
+      value:
+        type: boolean
+        description: |
+          * true - рейтинг +1
+          * false - рейтинг -1
+  VoteResponses:
+    description: Текущий рейтинг.
+    type: object
+    properties:
+      value:
+        type: number
+        format: int32
+        description: Общее количество голосов.
+        x-isnullable: false
+      vote:
+        type: boolean

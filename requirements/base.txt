@@ -1,3 +1,4 @@
-django==2.1.7
+django>=2.0
 pytz==2018.9
 sqlparse==0.3.0
+djangorestframework>=3.9
