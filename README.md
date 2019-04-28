@@ -3,7 +3,7 @@ Homework for Otus course - [otus.ru](https://otus.ru/lessons/razrabotchik-python
 Q&A analog of stackoverflow on Django 2.0
 
 ### Author
-Игорь Смуров
+Игорь Смуров<br>
 email: smurov_igor@mail.ru
 
 ### Requirements
