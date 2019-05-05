@@ -30,12 +30,10 @@ class TestQuestionModel(TestCase):
         question2 = Question.objects.create(
             title='To be or not to be?',
             author=self.user)
-        self.assertNotEqual(
-            question1.slug,
-            question2.slug)
-        self.assertNotEqual(
-            question1.get_absolute_url(),
-            question2.get_absolute_url())
+        self.assertNotEqual(question1.slug,
+                            question2.slug)
+        self.assertNotEqual(question1.get_absolute_url(),
+                            question2.get_absolute_url())
 
     def test_author_cannot_vote_for_own_question(self):
         question = Question.objects.create(
@@ -89,6 +87,7 @@ class TestQuestionModel(TestCase):
             title='Question 3', rating=3, author=self.user)
         question4 = Question.objects.create(
             title='Question 2', rating=2, author=self.user)
+        
         self.assertEqual(
             list(Question.objects.popular()),
             [question3, question4, question1, question2]
@@ -112,16 +111,24 @@ class TestAnswerModel(TestCase):
             title='To be or not to be?',
             author=self.user)
 
-    def test_only_question_owner_can_mark_an_answer_as_correct(self):
+    def test_question_author_can_mark_an_answer_as_correct(self):
         answer = Answer.objects.create(
             text='Answer',
             question=self.question,
             author=self.other_user)
 
         self.assertTrue(self.question.author, self.user)
+        self.assertTrue(answer.author, self.other_user)
         self.assertTrue(answer.mark(self.user))
 
-        self.assertNotEqual(self.question.author, self.other_user)
+    def test_other_user_cannot_mark_an_answer_as_correct(self):
+        answer = Answer.objects.create(
+            text='Answer',
+            question=self.question,
+            author=self.user)
+
+        self.assertTrue(self.question.author, self.user)
+        self.assertTrue(answer.author, self.user)
         self.assertFalse(answer.mark(self.other_user))
 
     def test_question_owner_can_not_mark_self_answer_as_correct(self):
@@ -131,6 +138,7 @@ class TestAnswerModel(TestCase):
             author=self.user)
 
         self.assertTrue(self.question.author, self.user)
+        self.assertTrue(answer.author, self.user)
         self.assertFalse(answer.mark(self.user))
 
     def test_only_one_answer_can_be_marked(self):
@@ -144,27 +152,25 @@ class TestAnswerModel(TestCase):
             question=self.question,
             author=self.other_user)
 
+        # (1) Mark answer 1
         answer1.mark(self.user)
-        self.assertTrue(self.question.has_answer)
-        self.assertEqual(answer1, self.question.correct_answer)
+        self.assertTrue(self.question.has_answer, 'after mark #1')
+        self.assertEqual(answer1, self.question.correct_answer, 'after mark #1')
 
+        # (2) Unmark answer 1
+        answer1.mark(self.user)
+        self.assertFalse(self.question.has_answer, 'after mark #2')
+
+        # (3) Mark answer 2
         answer2.mark(self.user)
-        self.assertTrue(self.question.has_answer)
-        self.assertNotEqual(answer1, self.question.correct_answer)
-        self.assertEqual(answer2, self.question.correct_answer)
+        self.assertTrue(self.question.has_answer, 'after mark #3')
+        self.assertEqual(answer2, self.question.correct_answer, 'after mark #3')
 
+        # (4) Unmark answer 2
+        # and Mark answer 1
         answer1.mark(self.user)
-        self.assertTrue(self.question.has_answer)
-        self.assertEqual(answer1, self.question.correct_answer)
-        self.assertNotEqual(answer2, self.question.correct_answer)
-
-        answer1.mark(self.user)
-        self.assertFalse(self.question.has_answer)
-
-        answer2.mark(self.user)
-        self.assertTrue(self.question.has_answer)
-        self.assertNotEqual(answer1, self.question.correct_answer)
-        self.assertEqual(answer2, self.question.correct_answer)
+        self.assertTrue(self.question.has_answer, 'after mark #4')
+        self.assertEqual(answer1, self.question.correct_answer, 'after mark #4')
 
     def test_user_cannot_vote_twice(self):
         answer = Answer.objects.create(

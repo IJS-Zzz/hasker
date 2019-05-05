@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from ..models import User
-from ..views import SingUpView
+from ..views import SingUpView, UserEditView
 
 
 class TestSingUpView(TestCase):
@@ -14,7 +14,7 @@ class TestSingUpView(TestCase):
                           'password1': 'TopSecret9602',
                           'password2': 'TopSecret9602',}
 
-    def test_user_registration_all_fields(self):
+    def test_registration_with_all_fields(self):
         users = User.objects.all()
         self.assertEqual(len(users), 0)
 
@@ -25,8 +25,8 @@ class TestSingUpView(TestCase):
 
         users = User.objects.all()
         self.assertEqual(len(users), 1)
-        user = users[0]
 
+        user = users[0]
         self.assertEqual(user.email, self.user_data['email'])
         self.assertEqual(user.username, self.user_data['username'])
 
@@ -56,7 +56,7 @@ class TestSingUpView(TestCase):
             'password2': 'secret' + self.user_data['password2'],
         }
 
-        response = self.client.post(self.url, data=self.user_data)
+        response = self.client.post(self.url, data=other_user_data)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue('email' in response.context['form'].errors)
@@ -69,6 +69,11 @@ class TestUserEditView(TestCase):
             username="test1",
             email="test1@example.com",
             password="secret"
+        )
+        self.other_user = User.objects.create(
+            username='test2',
+            email='test2@example.com',
+            password='secret'
         )
         self.url = reverse('account:edit')
 
@@ -86,6 +91,31 @@ class TestUserEditView(TestCase):
         response = self.client.get(self.url)
         ctx = response.context
         self.assertEqual(ctx['form']['email'].value(), self.user.email)
+
+    def test_user_email_is_unique(self):
+        self.client.force_login(self.user)
+
+        data = {'email': self.other_user.email,}
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue('email' in response.context['form'].errors)
+        self.assertContains(response, 'email address already exists')
+
+    def test_user_can_change_email(self):
+        self.client.force_login(self.user)
+
+        email = 'other_test_email@example.com'
+        self.assertNotEqual(email, self.user.email)
+        self.assertNotEqual(email, self.other_user.email)
+
+        data = {'email': email}
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response._headers['location'][1],
+                         self.user.url)
+        self.assertEqual(User.objects.get(id=self.user.id).email, email)
 
 
 class TestUserProfileView(TestCase):

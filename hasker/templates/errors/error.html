@@ -1,0 +1,19 @@
+{% extends 'layout.html'%}
+
+{% block title%}Internal Server Error{% endblock %}
+
+{% block main %}
+    <div class="mt-5 d-flex flex-row align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 text-center">
+                    <span class="display-1 d-block">{% block error_code %}500{% endblock %}</span>
+                    <div class="mb-4 lead">{% block error_message %}Oops, Something went wrong.{% endblock %}</div>
+                    <a href="#go-back" class="d-block btn btn-link"
+                        onclick="javascript:history.go(-1);">Return to previous page</a>
+                    <a href="{{homepage_url}}" class="d-block btn btn-link">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

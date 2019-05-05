@@ -6,13 +6,14 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from .fields import AvatarImageField
 
 
 def unique_avatar_filename(instance, filename):
-    file_path = 'uploads/avatars'
+    file_path = settings.AVATAR_FILE_PATH
     chunk_size = 65536
     hasher = hashlib.md5()
     instance.avatar.open()
@@ -26,13 +27,6 @@ def unique_avatar_filename(instance, filename):
 
 
 class User(AbstractUser):
-    email = models.EmailField(
-        _('email address'),
-        unique=True,
-        error_messages={
-            'unique': _('A user with that email address already exists.'),
-        },
-    )
     avatar = AvatarImageField(
         _('avatar'),
         upload_to=unique_avatar_filename,
@@ -46,7 +40,11 @@ class User(AbstractUser):
         return reverse('account:profile', kwargs={'username': self.username})
 
     def get_avatar_url(self):
-        return self.avatar.url if self.avatar else staticfiles_storage.url('img/avatar.png')
+        if self.avatar:
+            if self.avatar.storage.exists(self.avatar.name):
+                return self.avatar.url
+            self.avatar.delete()
+        return staticfiles_storage.url('img/avatar.png')
 
     @property
     def url(self):

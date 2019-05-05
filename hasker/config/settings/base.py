@@ -57,6 +57,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'hasker.core.context_processors.metadata',
             ],
         },
     },
@@ -98,8 +99,16 @@ USE_TZ = True
 
 STATICFILES_DIRS = [root('static'),]
 
+
+# URL's
+
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
+
+HOMEPAGE_URL = reverse_lazy('question:index')
+LOGIN_URL = reverse_lazy('account:login')
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 
 # Account
@@ -113,10 +122,7 @@ AVATAR_CONTENT_TYPES = (
     'image/png',
     'image/gif',
 )
-
-LOGIN_URL = reverse_lazy('account:login')
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+AVATAR_FILE_PATH = 'uploads/avatars'
 
 
 # Questions
